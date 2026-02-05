@@ -1,0 +1,660 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>My Prototype</title>
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- React CDN -->
+  <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+</head>
+<body class="bg-gray-100">
+
+  <!-- React root -->
+  <div id="root"></div>
+
+  <!-- YOUR JAVASCRIPT / REACT CODE -->
+  <script>
+    //<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Arogya Path - Master Version</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Noto+Sans+Devanagari:wght@400;500;700&display=swap" rel="stylesheet">
+    
+    <!-- Import Map -->
+    <script type="importmap">
+    {
+      "imports": {
+        "react": "https://esm.sh/react@18.2.0",
+        "react-dom/client": "https://esm.sh/react-dom@18.2.0/client",
+        "react-dom": "https://esm.sh/react-dom@18.2.0",
+        "lucide-react": "https://esm.sh/lucide-react@0.263.1?external=react",
+        "recharts": "https://esm.sh/recharts@2.8.0?external=react,react-dom"
+      }
+    }
+    </script>
+
+    <style>
+        body { font-family: 'Plus Jakarta Sans', 'Noto Sans Devanagari', sans-serif; }
+        .animate-fadeIn { animation: fadeIn 0.5s ease-out; }
+        .animate-popIn { animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        .animate-pulse-slow { animation: pulse 3s infinite; }
+        
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes popIn { from { opacity: 0; transform: scale(0.9); } to { opacity: 1; transform: scale(1); } }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 antialiased selection:bg-indigo-100 selection:text-indigo-700">
+
+    <div id="root"></div>
+
+    <script type="module">
+        import React, { useState, useEffect } from 'react';
+        import ReactDOM from 'react-dom/client';
+        import { 
+            Activity, Calendar, MessageSquare, User, Shield, Clock, FileText, 
+            ChevronRight, Stethoscope, Search, CheckCircle, AlertCircle, Menu, 
+            X, MapPin, Star, Award, TrendingUp, Lock, Eye, DollarSign, 
+            AlertTriangle, ArrowRight, Mic, Globe, CreditCard, Building2, Ticket, Heart, Download
+        } from 'lucide-react';
+        import { 
+            LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, AreaChart, Area 
+        } from 'recharts';
+
+        // --- 1. LOCALIZATION DICTIONARY ---
+        const TEXTS = {
+            en: {
+                nav: { home: "Home", chat: "AI Doctor", find: "Find Specialist", dash: "Dashboard" },
+                hero: { title: "Your Health, Connected.", subtitle: "AI diagnostics, verified specialists, and smart queues for everyone.", chatBtn: "Talk to AI Doctor", bookBtn: "Find Specialist", lang: "Language" },
+                trust: { verified: "Verified Specialists", queue: "Smart Queues", price: "Transparent Pricing", verifiedDesc: "100% credential-checked doctors.", queueDesc: "Auto-reshuffle if you are late.", priceDesc: "Compare lab & doctor fees." },
+                doctor: { verified: "Verified License", premium: "Premium Listing", rating: "Rating", fee: "Fee", book: "Book Appointment", view: "View Profile", exp: "Exp", comm: "Small platform fee applies", license: "Lic No" },
+                queue: { title: "Live Queue Status", serving: "Now Serving", your: "Your Token", wait: "Estimated Wait", mins: "mins", late: "Running Late?", lateDesc: "Don't worry. Our algorithm will move you 3 slots down so you don't lose your turn.", simulate: "Simulate Late Arrival", adjusted: "Queue Adjusted (+3 Slots)", people: "People Ahead" },
+                dash: { title: "Medical Reports", privacy: "PRIVACY MODE", unlock: "Grant Consent", locked: "Records Locked", lockedDesc: "Verify identity to view original reports.", history: "Appointment History", ai: "AI Suggestions", sugarAlert: "Sugar Trend Alert", followUp: "Follow-up Due", compare: "Compare Prices", tableDate: "Date", tableDoc: "Doctor", tableType: "Type", tableStatus: "Status", download: "Download Full Record" },
+                stats: { bp: "Blood Pressure", heart: "Heart Rate", chol: "Cholesterol", sugar: "Blood Sugar" },
+                chat: { welcome: "Namaste! I am Dr. Arogya AI. Describe your symptoms.", processing: "Processing symptoms...", chestWarn: "⚠️ Chest pain is serious. Recommended Cardiologist:", skin: "Dermatology concern detected. Recommended Specialist:", general: "General Physician recommended:", type: "Type symptoms...", send: "Send", recTag: "RECOMMENDED" },
+                business: { sub: "Hospital Subscription Active", comm: "Commission per booking: ₹20" }
+            },
+            hi: {
+                nav: { home: "होम", chat: "AI डॉक्टर", find: "डॉक्टर खोजें", dash: "डैशबोर्ड" },
+                hero: { title: "आपका स्वास्थ्य, हमारी प्राथमिकता", subtitle: "ग्रामीण भारत के लिए AI निदान और स्मार्ट कतार प्रणाली।", chatBtn: "AI डॉक्टर से बात करें", bookBtn: "विशेषज्ञ खोजें", lang: "भाषा" },
+                trust: { verified: "सत्यापित विशेषज्ञ", queue: "स्मार्ट कतार", price: "पारदर्शी मूल्य", verifiedDesc: "100% क्रेडेंशियल-जांच किए गए डॉक्टर।", queueDesc: "देर होने पर कतार अपने आप बदल जाएगी।", priceDesc: "लैब और डॉक्टर की फीस की तुलना करें।" },
+                doctor: { verified: "सत्यापित लाइसेंस", premium: "प्रीमियम लिस्टिंग", rating: "रेटिंग", fee: "फीस", book: "अपॉइंटमेंट बुक करें", view: "प्रोफाइल देखें", exp: "अनुभव", comm: "छोटा प्लेटफॉर्म शुल्क लागू", license: "लाइसेंस नं" },
+                queue: { title: "लाइव कतार स्थिति", serving: "अभी चल रहा है", your: "आपका टोकन", wait: "अनुमानित समय", mins: "मिनट", late: "देरी हो रही है?", lateDesc: "चिंता न करें। हम आपको 3 स्लॉट पीछे कर देंगे ताकि आपकी बारी न जाए।", simulate: "देरी सिमुलेट करें", adjusted: "कतार समायोजित (+3 स्लॉट)", people: "लोग आगे हैं" },
+                dash: { title: "मेडिकल रिपोर्ट", privacy: "गोपनीयता मोड", unlock: "सहमति दें", locked: "रिकॉर्ड लॉक हैं", lockedDesc: "रिपोर्ट देखने के लिए पहचान सत्यापित करें।", history: "अपॉइंटमेंट इतिहास", ai: "AI सुझाव", sugarAlert: "शुगर चेतावनी", followUp: "फॉलो-अप बाकी है", compare: "कीमतों की तुलना", tableDate: "तारीख", tableDoc: "डॉक्टर", tableType: "प्रकार", tableStatus: "स्थिति", download: "पूरा रिकॉर्ड डाउनलोड करें" },
+                stats: { bp: "रक्तचाप", heart: "हृदय गति", chol: "कोलेस्ट्रॉल", sugar: "ब्लड शुगर" },
+                chat: { welcome: "नमस्ते! मैं डॉ. आरोग्य AI हूँ। अपने लक्षण बताएं।", processing: "लक्षणों की जांच हो रही है...", chestWarn: "⚠️ सीने में दर्द गंभीर है। अनुशंसित हृदय रोग विशेषज्ञ:", skin: "त्वचा की समस्या का पता चला। विशेषज्ञ:", general: "सामान्य चिकित्सक की सिफारिश:", type: "लक्षण टाइप करें...", send: "भेजें", recTag: "सिफारिश" },
+                business: { sub: "अस्पताल सदस्यता सक्रिय", comm: "बुकिंग कमीशन: ₹20" }
+            },
+            mr: {
+                nav: { home: "मुख्य", chat: "AI डॉक्टर", find: "तज्ञ शोधा", dash: "डॅशबोर्ड" },
+                hero: { title: "तुमचे आरोग्य, आमची जबाबदारी", subtitle: "ग्रामीण भारतासाठी AI निदान आणि स्मार्ट रांग प्रणाली।", chatBtn: "AI डॉक्टरांशी बोला", bookBtn: "तज्ञ शोधा", lang: "भाषा" },
+                trust: { verified: "सत्यापित विशेषज्ञ", queue: "स्मार्ट रांग", price: "पारदर्शक दर", verifiedDesc: "100% परवानाधारक डॉक्टर.", queueDesc: "उशीर झाल्यास रांग आपोआप बदलेल।", priceDesc: "लॅब आणि डॉक्टरांच्या फीची तुलना करा।" },
+                doctor: { verified: "सत्यापित परवाना", premium: "प्रीमियम यादी", rating: "दर्जा", fee: "फी", book: "अपॉइंटमेंट बुक करा", view: "प्रोफाइल पहा", exp: "अनुभव", comm: "लहान प्लॅटफॉर्म फी लागू", license: "परवाना क्र" },
+                queue: { title: "थेट रांग स्थिती", serving: "सध्या सुरू", your: "तुमचा टोकन", wait: "अंदाजित वेळ", mins: "मिनिटे", late: "उशीर होत आहे?", lateDesc: "काळजी करू नका. आम्ही तुम्हाला ३ स्लॉट खाली हलवू.", simulate: "उशीर झाला असे समजा", adjusted: "रांग समायोजित (+3 स्लॉट)", people: "लोक पुढे आहेत" },
+                dash: { title: "वैद्यकीय अहवाल", privacy: "गोपनीयता मोड", unlock: "संमती द्या", locked: "रेकॉर्ड लॉक आहेत", lockedDesc: "अहवाल पाहण्यासाठी ओळख पटवा.", history: "अपॉइंटमेंट इतिहास", ai: "AI सल्ला", sugarAlert: "साखर चेतावणी", followUp: "फॉलो-अप बाकी", compare: "दरांची तुलना", tableDate: "तारीख", tableDoc: "डॉक्टर", tableType: "प्रकार", tableStatus: "स्थिती", download: "पूर्ण रेकॉर्ड डाउनलोड करा" },
+                stats: { bp: "रक्तदाब", heart: "हृदय गती", chol: "कोलेस्ट्रॉल", sugar: "रक्तातील साखर" },
+                chat: { welcome: "नमस्ते! मी डॉ. आरोग्य AI आहे. तुमची लक्षणे सांगा.", processing: "तपासणी सुरू आहे...", chestWarn: "⚠️ छातीत दुखणे गंभीर आहे. हृदयविकार तज्ञ:", skin: "त्वचेची समस्या. तज्ञ:", general: "सामान्य चिकित्सक:", type: "लक्षणे लिहा...", send: "पाठवा", recTag: "शिफारस" },
+                business: { sub: "रुग्णालय सदस्यता सक्रिय", comm: "बुकिंग कमिशन: ₹20" }
+            }
+        };
+
+        // --- 2. LOCALIZED DATA GENERATORS ---
+        
+        const getDoctors = (lang) => {
+            return [
+                { 
+                    id: 1, 
+                    name: lang === 'hi' ? "डॉ. अंजलि देसाई" : (lang === 'mr' ? "डॉ. अंजली देसाई" : "Dr. Anjali Desai"),
+                    specialty: lang === 'hi' ? "हृदय रोग विशेषज्ञ" : (lang === 'mr' ? "हृदयविकार तज्ञ" : "Cardiologist"),
+                    degrees: "MBBS, MD (Cardiology)",
+                    licenseId: "MED-IN-88392",
+                    experience: lang === 'hi' ? "12 साल" : (lang === 'mr' ? "12 वर्षे" : "12 years"), 
+                    rating: 4.9, reviews: 124, hospital: lang === 'hi' ? "सिटी हार्ट इंस्टिट्यूट" : "City Heart Institute",
+                    fee: 800, isPremium: true, waitTime: "15 mins", verified: true,
+                    imageColor: "bg-rose-100 text-rose-600",
+                    bio: lang === 'hi' ? "निवारक कार्डियोलॉजी में वरिष्ठ विशेषज्ञ। AIIMS दिल्ली से स्वर्ण पदक विजेता।" : "Senior Interventional Cardiologist. Gold medalist from AIIMS Delhi.",
+                    queueStatus: { currentToken: 12, yourToken: 15, avgTimePerPatient: 10 }
+                },
+                { 
+                    id: 2, 
+                    name: lang === 'hi' ? "डॉ. राजेश कुमार" : "Dr. Rajesh Kumar", 
+                    specialty: lang === 'hi' ? "सामान्य चिकित्सक" : (lang === 'mr' ? "सामान्य चिकित्सक" : "General Physician"),
+                    degrees: "MBBS, MD", licenseId: "MED-IN-44210",
+                    experience: "8 years", rating: 4.5, reviews: 89, hospital: "Arogya Health Center",
+                    fee: 500, isPremium: false, waitTime: "45 mins", verified: true,
+                    imageColor: "bg-blue-100 text-blue-600",
+                    bio: lang === 'hi' ? "मधुमेह और उच्च रक्तचाप जैसी बीमारियों के विशेषज्ञ।" : "Expert in managing chronic diseases like Diabetes.",
+                    queueStatus: { currentToken: 4, yourToken: 22, avgTimePerPatient: 8 }
+                },
+                { 
+                    id: 3, 
+                    name: lang === 'hi' ? "डॉ. एस. विलियम्स" : "Dr. S. Williams", 
+                    specialty: lang === 'hi' ? "त्वचा विशेषज्ञ" : (lang === 'mr' ? "त्वचा तज्ञ" : "Dermatologist"),
+                    degrees: "MBBS, DDVL", licenseId: "MED-IN-11029",
+                    experience: "5 years", rating: 4.8, reviews: 56, hospital: "Skin & Glow Clinic",
+                    fee: 600, isPremium: true, waitTime: "10 mins", verified: true,
+                    imageColor: "bg-purple-100 text-purple-600",
+                    bio: lang === 'hi' ? "कॉस्मेटिक डर्मेटोलॉजी और लेजर उपचार में विशेषज्ञ।" : "Specialist in cosmetic dermatology and laser treatments.",
+                    queueStatus: { currentToken: 8, yourToken: 9, avgTimePerPatient: 12 }
+                }
+            ];
+        };
+
+        const getReports = (lang) => {
+            return [
+                { id: 101, title: lang === 'hi' ? "लिपिड प्रोफाइल" : "Lipid Profile", date: "2025-02-15", lab: "City Labs", status: "Critical", content: "Cholesterol: 240 mg/dL (High), HDL: 35 mg/dL (Low)" },
+                { id: 102, title: lang === 'hi' ? "पूर्ण रक्त गणना (CBC)" : "Complete Blood Count", date: "2025-01-01", lab: "Max Path", status: "Normal", content: "Hemoglobin: 14.5 g/dL, WBC: 7500 /cmm" },
+            ];
+        };
+
+        const getHistory = (lang) => {
+             return [
+                { id: 'a1', date: '2025-02-01', doctor: lang === 'hi' ? "डॉ. राजेश कुमार" : "Dr. Rajesh Kumar", type: lang === 'hi' ? "परामर्श" : "Consultation", status: lang === 'hi' ? "पूर्ण" : "Completed" },
+                { id: 'a2', date: '2025-01-15', doctor: lang === 'hi' ? "डॉ. एस. विलियम्स" : "Dr. S. Williams", type: lang === 'hi' ? "फॉलो-अप" : "Follow-up", status: lang === 'hi' ? "पूर्ण" : "Completed" },
+            ];
+        };
+
+        const getLabPrices = (lang) => {
+             return [
+                { name: "City Labs", price: 450, distance: "1.2 km", rating: 4.2 },
+                { name: "Max Path", price: 600, distance: "0.5 km", rating: 4.8 },
+                { name: lang === 'hi' ? "सरकारी अस्पताल" : "Govt Hospital", price: 150, distance: "5.0 km", rating: 3.5 },
+            ];
+        };
+
+        // --- 3. COMPONENTS ---
+
+        const VerifiedBadge = ({ text }) => (
+            React.createElement("span", { className: "bg-emerald-100 text-emerald-700 text-[10px] md:text-xs px-2 py-0.5 rounded-full flex items-center gap-1 font-bold border border-emerald-200" },
+                React.createElement(CheckCircle, { size: 12, className: "fill-current" }), text
+            )
+        );
+
+        const PremiumBadge = ({ text }) => (
+            React.createElement("span", { className: "bg-amber-100 text-amber-700 text-[10px] px-2 py-0.5 rounded-full flex items-center gap-1 font-bold border border-amber-200 uppercase tracking-wider" },
+                React.createElement(Star, { size: 10, className: "fill-current" }), text
+            )
+        );
+
+        // --- 4. MAIN APP ---
+
+        function App() {
+            const [currentView, setCurrentView] = useState('home');
+            const [selectedDoctor, setSelectedDoctor] = useState(null);
+            const [language, setLanguage] = useState(null); 
+            const [menuOpen, setMenuOpen] = useState(false);
+
+            const t = (section, key) => {
+                const lang = language || 'en';
+                return TEXTS[lang][section][key];
+            };
+
+            const handleDoctorClick = (doctor) => {
+                setSelectedDoctor(doctor);
+                setCurrentView('doctor-profile');
+            };
+
+            // LANGUAGE MODAL
+            if (!language) {
+                return React.createElement("div", { className: "fixed inset-0 z-[100] bg-slate-900 flex items-center justify-center p-4 animate-fadeIn" },
+                    React.createElement("div", { className: "bg-white rounded-3xl p-8 max-w-sm w-full text-center shadow-2xl border-4 border-indigo-100" },
+                        React.createElement("div", { className: "w-20 h-20 bg-indigo-100 rounded-full flex items-center justify-center mx-auto mb-6 text-indigo-600 animate-pulse-slow relative" },
+                            React.createElement(Mic, { size: 40 }),
+                            React.createElement("span", { className: "absolute -top-1 -right-1 w-4 h-4 bg-green-500 rounded-full animate-ping" })
+                        ),
+                        React.createElement("h2", { className: "text-2xl font-bold mb-2 text-slate-900" }, "Choose Language"),
+                        React.createElement("p", { className: "text-slate-500 mb-8" }, "Select your preferred language to start."),
+                        React.createElement("div", { className: "space-y-3" },
+                            [
+                                { code: 'en', label: 'English' },
+                                { code: 'hi', label: 'Hindi (हिंदी)' },
+                                { code: 'mr', label: 'Marathi (मराठी)' }
+                            ].map(lang => 
+                                React.createElement("button", {
+                                    key: lang.code,
+                                    onClick: () => setLanguage(lang.code),
+                                    className: "w-full py-4 px-6 rounded-xl border-2 border-slate-100 hover:border-indigo-600 hover:bg-indigo-50 hover:text-indigo-700 font-bold text-lg transition-all flex items-center justify-between group"
+                                },
+                                    React.createElement("span", null, lang.label),
+                                    React.createElement(ChevronRight, { className: "text-slate-300 group-hover:text-indigo-600", size: 20 })
+                                )
+                            )
+                        )
+                    )
+                );
+            }
+
+            // VIEWS
+            const HomeView = () => (
+                React.createElement("div", { className: "space-y-12 animate-fadeIn" },
+                    // Hero
+                    React.createElement("div", { className: "bg-gradient-to-br from-indigo-700 to-violet-800 rounded-[2.5rem] p-8 md:p-16 text-center text-white shadow-2xl shadow-indigo-200 relative overflow-hidden" },
+                        React.createElement("div", { className: "absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" }),
+                        React.createElement("div", { className: "relative z-10" },
+                            React.createElement("div", { className: "inline-flex items-center gap-2 bg-white/10 backdrop-blur-md px-4 py-1.5 rounded-full mb-6 border border-white/20" },
+                                React.createElement(Globe, { size: 14, className: "text-emerald-300" }),
+                                React.createElement("span", { className: "text-sm font-medium text-emerald-100" }, `${t('hero', 'lang')}: ${language === 'hi' ? 'Hindi' : (language === 'mr' ? 'Marathi' : 'English')}`)
+                            ),
+                            React.createElement("h1", { className: "text-3xl md:text-6xl font-extrabold mb-6 leading-tight" }, t('hero', 'title')),
+                            React.createElement("p", { className: "text-lg md:text-xl text-indigo-100 max-w-2xl mx-auto mb-10 leading-relaxed" }, t('hero', 'subtitle')),
+                            React.createElement("div", { className: "flex flex-col sm:flex-row justify-center gap-4" },
+                                React.createElement("button", { 
+                                    onClick: () => setCurrentView('chat'),
+                                    className: "px-8 py-4 bg-white text-indigo-700 rounded-2xl font-bold hover:shadow-lg hover:shadow-indigo-500/30 hover:scale-105 transition-all flex items-center justify-center gap-3" 
+                                }, React.createElement(MessageSquare, { size: 20 }), t('hero', 'chatBtn')),
+                                React.createElement("button", { 
+                                    onClick: () => setCurrentView('appointments'),
+                                    className: "px-8 py-4 bg-indigo-600/50 backdrop-blur-md border border-white/20 text-white rounded-2xl font-bold hover:bg-indigo-600/70 transition-all flex items-center justify-center gap-3" 
+                                }, React.createElement(Calendar, { size: 20 }), t('hero', 'bookBtn'))
+                            )
+                        )
+                    ),
+                    // Features
+                    React.createElement("div", { className: "grid md:grid-cols-3 gap-6" },
+                        React.createElement("div", { className: "bg-white p-8 rounded-3xl shadow-sm border border-slate-100 hover:shadow-xl transition-shadow group" },
+                            React.createElement("div", { className: "w-14 h-14 bg-emerald-100 text-emerald-600 rounded-2xl flex items-center justify-center mb-6" }, React.createElement(Shield, { size: 28 })),
+                            React.createElement("h3", { className: "text-xl font-bold text-slate-900 mb-2" }, t('trust', 'verified')),
+                            React.createElement("p", { className: "text-slate-600" }, t('trust', 'verifiedDesc'))
+                        ),
+                        React.createElement("div", { className: "bg-white p-8 rounded-3xl shadow-sm border border-slate-100 hover:shadow-xl transition-shadow group" },
+                            React.createElement("div", { className: "w-14 h-14 bg-amber-100 text-amber-600 rounded-2xl flex items-center justify-center mb-6" }, React.createElement(Clock, { size: 28 })),
+                            React.createElement("h3", { className: "text-xl font-bold text-slate-900 mb-2" }, t('trust', 'queue')),
+                            React.createElement("p", { className: "text-slate-600" }, t('trust', 'queueDesc'))
+                        ),
+                        React.createElement("div", { className: "bg-white p-8 rounded-3xl shadow-sm border border-slate-100 hover:shadow-xl transition-shadow group" },
+                            React.createElement("div", { className: "w-14 h-14 bg-blue-100 text-blue-600 rounded-2xl flex items-center justify-center mb-6" }, React.createElement(CreditCard, { size: 28 })),
+                            React.createElement("h3", { className: "text-xl font-bold text-slate-900 mb-2" }, t('trust', 'price')),
+                            React.createElement("p", { className: "text-slate-600" }, t('trust', 'priceDesc'))
+                        )
+                    )
+                )
+            );
+
+            // Chat View
+            const VirtualDoctorView = () => {
+                const [messages, setMessages] = useState([{ type: 'bot', text: t('chat', 'welcome') }]);
+                const [input, setInput] = useState("");
+                const [isTyping, setIsTyping] = useState(false);
+
+                const handleSend = () => {
+                    if (!input.trim()) return;
+                    setMessages(prev => [...prev, { type: 'user', text: input }]);
+                    setInput("");
+                    setIsTyping(true);
+
+                    // AI Logic Simulation
+                    setTimeout(() => {
+                        const lower = input.toLowerCase();
+                        let responseText = t('chat', 'processing');
+                        let recDoc = null;
+                        const docs = getDoctors(language);
+
+                        if (lower.includes('chest') || lower.includes('pain') || lower.includes('dard') || lower.includes('dukh')) {
+                            responseText = t('chat', 'chestWarn');
+                            recDoc = docs[0]; // Cardio
+                        } else if (lower.includes('skin') || lower.includes('rash') || lower.includes('khujli')) {
+                            responseText = t('chat', 'skin');
+                            recDoc = docs[2]; // Derma
+                        } else {
+                            responseText = t('chat', 'general');
+                            recDoc = docs[1]; // Gen Phys
+                        }
+
+                        setMessages(prev => [...prev, { type: 'bot', text: responseText, recommendedDoctor: recDoc }]);
+                        setIsTyping(false);
+                    }, 1500);
+                };
+
+                return React.createElement("div", { className: "max-w-4xl mx-auto h-[650px] flex flex-col bg-white rounded-3xl shadow-xl border border-slate-200 overflow-hidden" },
+                    React.createElement("div", { className: "bg-indigo-700 p-6 flex justify-between items-center text-white" },
+                        React.createElement("div", { className: "flex items-center gap-4" },
+                            React.createElement("div", { className: "p-3 bg-white/10 rounded-2xl backdrop-blur-sm" }, React.createElement(Stethoscope, { size: 24 })),
+                            React.createElement("div", null,
+                                React.createElement("h2", { className: "font-bold text-xl" }, t('nav', 'chat')),
+                                React.createElement("p", { className: "text-indigo-200 text-xs" }, "AI Powered")
+                            )
+                        )
+                    ),
+                    React.createElement("div", { className: "flex-1 overflow-y-auto p-6 space-y-6 bg-slate-50" },
+                        messages.map((msg, idx) => 
+                            React.createElement("div", { key: idx, className: `flex ${msg.type === 'user' ? 'justify-end' : 'justify-start'}` },
+                                React.createElement("div", { className: `max-w-[85%] p-5 rounded-2xl shadow-sm ${msg.type === 'user' ? 'bg-indigo-600 text-white rounded-br-none' : 'bg-white border border-slate-200 text-slate-800 rounded-bl-none'}` },
+                                    React.createElement("p", { className: "leading-relaxed" }, msg.text),
+                                    msg.recommendedDoctor && React.createElement("div", { 
+                                        className: "mt-4 bg-indigo-50 border border-indigo-100 rounded-xl p-4 cursor-pointer relative overflow-hidden hover:shadow-md transition-shadow",
+                                        onClick: () => handleDoctorClick(msg.recommendedDoctor)
+                                    },
+                                        React.createElement("div", { className: "absolute top-0 right-0 bg-indigo-200 text-indigo-800 text-[10px] font-bold px-2 py-1 rounded-bl-lg" }, t('chat', 'recTag')),
+                                        React.createElement("div", { className: "flex items-center gap-4" },
+                                            React.createElement("div", { className: `w-12 h-12 ${msg.recommendedDoctor.imageColor} rounded-full flex items-center justify-center` }, React.createElement(User, { size: 20 })),
+                                            React.createElement("div", null,
+                                                React.createElement("p", { className: "font-bold text-indigo-900" }, msg.recommendedDoctor.name),
+                                                React.createElement("p", { className: "text-sm text-slate-500" }, msg.recommendedDoctor.specialty)
+                                            )
+                                        ),
+                                        React.createElement("button", { className: "w-full mt-3 bg-indigo-600 text-white py-2 rounded-lg text-sm font-bold" }, t('doctor', 'view'))
+                                    )
+                                )
+                            )
+                        ),
+                        isTyping && React.createElement("div", { className: "p-4 text-slate-400 text-sm" }, "Typing...")
+                    ),
+                    React.createElement("div", { className: "p-4 bg-white border-t border-slate-200 flex gap-3" },
+                        React.createElement("input", { 
+                            className: "flex-1 bg-slate-100 rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-indigo-100",
+                            placeholder: t('chat', 'type'),
+                            value: input,
+                            onChange: e => setInput(e.target.value),
+                            onKeyPress: e => e.key === 'Enter' && handleSend()
+                        }),
+                        React.createElement("button", { onClick: handleSend, className: "bg-indigo-600 text-white px-6 rounded-xl font-bold" }, t('chat', 'send'))
+                    )
+                );
+            };
+
+            // Doctor & Queue View
+            const DoctorProfileView = ({ doctor, onBack }) => {
+                const [activeTab, setActiveTab] = useState('overview');
+                const [simulatedToken, setSimulatedToken] = useState(doctor.queueStatus.yourToken);
+                const [isLate, setIsLate] = useState(false);
+                
+                const current = doctor.queueStatus.currentToken;
+                const waitTime = Math.max(0, (simulatedToken - current) * doctor.queueStatus.avgTimePerPatient);
+
+                const simulateLate = () => {
+                    setIsLate(true);
+                    setSimulatedToken(prev => prev + 3);
+                };
+
+                return React.createElement("div", { className: "max-w-5xl mx-auto space-y-6 animate-popIn" },
+                    React.createElement("button", { onClick: onBack, className: "flex items-center text-slate-500 hover:text-indigo-600 transition-colors font-medium" },
+                        React.createElement(ArrowRight, { className: "rotate-180 mr-2", size: 18 }), t('nav', 'find')
+                    ),
+                    React.createElement("div", { className: "bg-white rounded-3xl p-6 md:p-8 shadow-xl border border-slate-100 flex flex-col md:flex-row gap-8 relative overflow-hidden" },
+                        doctor.isPremium && React.createElement("div", { className: "absolute top-0 right-0 bg-gradient-to-l from-amber-100 to-white px-4 py-2" }, React.createElement(PremiumBadge, { text: t('doctor', 'premium') })),
+                        React.createElement("div", { className: `w-32 h-32 md:w-48 md:h-48 ${doctor.imageColor} rounded-3xl flex items-center justify-center text-6xl shadow-inner flex-shrink-0` }, React.createElement(User, { size: 80 })),
+                        React.createElement("div", { className: "flex-1 space-y-4" },
+                            React.createElement("div", null,
+                                React.createElement("h1", { className: "text-3xl font-bold text-slate-900" }, doctor.name),
+                                React.createElement("div", { className: "flex flex-wrap gap-2 mt-2" },
+                                    React.createElement(VerifiedBadge, { text: t('doctor', 'verified') }),
+                                    React.createElement("span", { className: "text-xs px-2 py-0.5 bg-slate-100 text-slate-500 rounded-full border border-slate-200 font-mono" }, `${t('doctor', 'license')}: ${doctor.licenseId}`)
+                                )
+                            ),
+                            React.createElement("div", { className: "flex items-center gap-2 text-slate-500 text-sm font-medium" },
+                                React.createElement(Award, { size: 16, className: "text-indigo-500" }),
+                                React.createElement("span", null, doctor.degrees),
+                                React.createElement("span", { className: "w-1 h-1 bg-slate-300 rounded-full" }),
+                                React.createElement("span", null, `${doctor.experience} ${t('doctor', 'exp')}`),
+                            ),
+                            React.createElement("p", { className: "text-slate-600 leading-relaxed max-w-2xl" }, doctor.bio),
+                            React.createElement("div", { className: "flex items-center gap-4 pt-4" },
+                                React.createElement("div", { className: "text-center px-4 py-2 bg-slate-50 rounded-xl" },
+                                    React.createElement("p", { className: "text-xs text-slate-400 font-bold uppercase" }, t('doctor', 'rating')),
+                                    React.createElement("p", { className: "text-lg font-bold text-amber-500 flex items-center justify-center gap-1" }, doctor.rating, React.createElement(Star, { size: 14, className: "fill-current" }))
+                                ),
+                                React.createElement("div", { className: "text-center px-4 py-2 bg-slate-50 rounded-xl" },
+                                    React.createElement("p", { className: "text-xs text-slate-400 font-bold uppercase" }, t('doctor', 'fee')),
+                                    React.createElement("p", { className: "text-lg font-bold text-slate-700" }, `₹${doctor.fee}`)
+                                )
+                            )
+                        ),
+                        React.createElement("div", { className: "w-full md:w-64 bg-slate-50 p-6 rounded-2xl border border-slate-200 flex flex-col gap-3" },
+                            React.createElement("button", { className: "w-full bg-indigo-600 text-white py-3 rounded-xl font-bold shadow-lg shadow-indigo-200 hover:bg-indigo-700 transition-all" }, t('doctor', 'book')),
+                            React.createElement("p", { className: "text-xs text-center text-slate-400" }, t('doctor', 'comm'))
+                        )
+                    ),
+                    React.createElement("div", { className: "flex gap-8 border-b border-slate-200 px-4" },
+                        React.createElement("button", { onClick: () => setActiveTab('overview'), className: `pb-4 font-bold ${activeTab === 'overview' ? 'text-indigo-600 border-b-4 border-indigo-600' : 'text-slate-400'}` }, "Overview"),
+                        React.createElement("button", { onClick: () => setActiveTab('queue'), className: `pb-4 font-bold ${activeTab === 'queue' ? 'text-indigo-600 border-b-4 border-indigo-600' : 'text-slate-400'}` }, t('trust', 'queue'))
+                    ),
+                    activeTab === 'queue' && React.createElement("div", { className: "bg-white rounded-3xl shadow-lg border border-slate-100 p-8 animate-fadeIn" },
+                        React.createElement("div", { className: "flex flex-col lg:flex-row gap-12" },
+                            React.createElement("div", { className: "flex-1" },
+                                React.createElement("h3", { className: "text-xl font-bold mb-8 flex items-center gap-2 text-slate-800" }, React.createElement(Clock, { className: "text-indigo-600" }), t('queue', 'title')),
+                                React.createElement("div", { className: "relative h-32 flex items-center mb-12" },
+                                    React.createElement("div", { className: "absolute w-full h-3 bg-slate-100 rounded-full" }),
+                                    React.createElement("div", { className: "absolute h-3 bg-gradient-to-r from-emerald-400 to-indigo-500 rounded-full transition-all duration-1000", style: { width: isLate ? '40%' : '60%' } }),
+                                    React.createElement("div", { className: "absolute left-0 transform -translate-x-0 flex flex-col items-center z-10" },
+                                        React.createElement("div", { className: "w-14 h-14 bg-emerald-500 text-white rounded-2xl flex items-center justify-center font-bold text-xl shadow-lg ring-4 ring-white" }, current),
+                                        React.createElement("p", { className: "mt-3 font-bold text-emerald-600 text-sm bg-emerald-50 px-2 py-1 rounded" }, t('queue', 'serving'))
+                                    ),
+                                    React.createElement("div", { className: "absolute flex flex-col items-center z-10 transition-all duration-1000", style: { left: isLate ? '60%' : '50%' } },
+                                        React.createElement("div", { className: `w-16 h-16 ${isLate ? 'bg-amber-500' : 'bg-indigo-600'} text-white rounded-2xl flex items-center justify-center font-bold text-2xl shadow-xl ring-4 ring-white` }, simulatedToken),
+                                        React.createElement("p", { className: "mt-3 font-bold text-indigo-900 text-sm bg-indigo-50 px-2 py-1 rounded" }, t('queue', 'your'))
+                                    )
+                                ),
+                                React.createElement("div", { className: "bg-slate-50 border border-slate-200 rounded-2xl p-6" },
+                                    React.createElement("div", { className: "flex items-start gap-4" },
+                                        React.createElement("div", { className: "p-3 bg-white rounded-xl shadow-sm text-amber-500" }, React.createElement(AlertTriangle)),
+                                        React.createElement("div", { className: "flex-1" },
+                                            React.createElement("h4", { className: "font-bold text-slate-900" }, t('queue', 'late')),
+                                            React.createElement("p", { className: "text-sm text-slate-500 mt-1 mb-4" }, t('queue', 'lateDesc')),
+                                            !isLate ? React.createElement("button", { onClick: simulateLate, className: "px-4 py-2 bg-white border border-slate-300 hover:border-amber-500 text-sm font-bold shadow-sm" }, t('queue', 'simulate')) 
+                                            : React.createElement("div", { className: "inline-block px-3 py-1 bg-amber-100 text-amber-700 text-xs font-bold rounded" }, t('queue', 'adjusted'))
+                                        )
+                                    )
+                                )
+                            ),
+                            React.createElement("div", { className: "lg:w-80 bg-slate-900 text-white rounded-3xl p-8 h-fit shadow-2xl relative" },
+                                React.createElement("h4", { className: "font-bold text-indigo-200 mb-6 uppercase tracking-wider text-xs" }, t('queue', 'wait')),
+                                React.createElement("div", { className: "text-5xl font-bold mb-2" }, `${waitTime}`),
+                                React.createElement("div", { className: "text-xl text-slate-400 mb-8" }, t('queue', 'mins')),
+                                React.createElement("div", { className: "space-y-4 border-t border-slate-700 pt-6" },
+                                    React.createElement("div", { className: "flex justify-between text-sm" },
+                                        React.createElement("span", { className: "text-slate-400" }, t('queue', 'people')),
+                                        React.createElement("span", { className: "font-bold" }, `${Math.max(0, simulatedToken - current)}`)
+                                    )
+                                )
+                            )
+                        )
+                    )
+                );
+            };
+
+            // Dashboard View
+            const DashboardView = () => {
+                const [consent, setConsent] = useState(false);
+                const [viewReport, setViewReport] = useState(null);
+                const reports = getReports(language);
+                const history = getHistory(language);
+                const labPrices = getLabPrices(language);
+
+                return React.createElement("div", { className: "space-y-8 animate-fadeIn" },
+                    // 1. VITALS STATS
+                    React.createElement("div", { className: "grid grid-cols-2 md:grid-cols-4 gap-4" },
+                        [{l: t('stats', 'bp'), v:'120/80', u:'mmHg', c:'emerald', i: Activity}, 
+                         {l: t('stats', 'heart'), v:'72', u:'bpm', c:'rose', i: Heart}, 
+                         {l: t('stats', 'chol'), v:'180', u:'mg/dL', c:'blue', i: Activity}, 
+                         {l: t('stats', 'sugar'), v:'110', u:'mg/dL', c:'amber', i: Activity}].map((stat, i) => 
+                            React.createElement("div", { key: i, className: "bg-white p-5 rounded-2xl shadow-sm border border-slate-100 relative overflow-hidden group hover:shadow-md transition-shadow" },
+                                React.createElement("div", { className: `absolute top-0 right-0 w-12 h-12 bg-${stat.c}-500 opacity-10 rounded-bl-2xl` }),
+                                React.createElement("p", { className: "text-slate-500 text-xs font-bold uppercase tracking-wide mb-1" }, stat.l),
+                                React.createElement("h3", { className: "text-2xl font-bold text-slate-800" }, stat.v),
+                                React.createElement("p", { className: "text-slate-400 text-xs mt-1" }, stat.u)
+                            )
+                        )
+                    ),
+
+                    React.createElement("div", { className: "grid lg:grid-cols-3 gap-8" },
+                        React.createElement("div", { className: "lg:col-span-2 space-y-8" },
+                            // Reports Panel
+                            React.createElement("div", { className: "bg-white rounded-3xl shadow-sm border border-slate-200 p-6 relative overflow-hidden" },
+                                React.createElement("div", { className: "flex justify-between items-center mb-6" },
+                                    React.createElement("h3", { className: "font-bold text-lg text-slate-800 flex items-center gap-2" }, React.createElement(FileText, { className: "text-indigo-600" }), t('dash', 'title')),
+                                    !consent ? React.createElement("span", { className: "text-xs bg-slate-100 px-2 py-1 rounded text-slate-500 flex items-center gap-1 font-bold" }, React.createElement(Lock, { size: 12 }), t('dash', 'privacy'))
+                                    : React.createElement("button", { className: "flex items-center gap-2 text-sm font-bold text-indigo-600 bg-indigo-50 px-3 py-1.5 rounded-lg hover:bg-indigo-100" }, React.createElement(Download, { size: 16 }), t('dash', 'download'))
+                                ),
+                                !consent ? React.createElement("div", { className: "text-center py-12 bg-slate-50 rounded-2xl border-2 border-dashed border-slate-200" },
+                                    React.createElement("div", { className: "w-16 h-16 bg-slate-200 rounded-full flex items-center justify-center mx-auto mb-4 text-slate-400" }, React.createElement(Lock, { size: 32 })),
+                                    React.createElement("h4", { className: "font-bold text-slate-700 text-lg" }, t('dash', 'locked')),
+                                    React.createElement("p", { className: "text-slate-500 text-sm max-w-md mx-auto mb-6 px-4" }, t('dash', 'lockedDesc')),
+                                    React.createElement("button", { onClick: () => setConsent(true), className: "bg-indigo-600 text-white px-6 py-2.5 rounded-xl font-bold" }, t('dash', 'unlock'))
+                                ) : React.createElement("div", { className: "space-y-4 animate-fadeIn" },
+                                    reports.map(report => 
+                                        React.createElement("div", { key: report.id, className: "flex justify-between items-center p-4 bg-slate-50 rounded-2xl border border-slate-100 group" },
+                                            React.createElement("div", { className: "flex items-center gap-4" },
+                                                React.createElement("div", { className: "bg-white p-3 rounded-xl shadow-sm text-red-500" }, React.createElement(FileText, { size: 20 })),
+                                                React.createElement("div", null,
+                                                    React.createElement("p", { className: "font-bold text-slate-800" }, report.title),
+                                                    React.createElement("p", { className: "text-xs text-slate-500" }, `${report.date} • ${report.lab}`)
+                                                )
+                                            ),
+                                            React.createElement("button", { onClick: () => setViewReport(report), className: "p-2 hover:bg-white rounded-lg text-indigo-600" }, React.createElement(Eye, { size: 20 }))
+                                        )
+                                    )
+                                ),
+                                viewReport && React.createElement("div", { className: "absolute inset-0 bg-white/95 z-10 flex flex-col p-6 animate-fadeIn" },
+                                    React.createElement("div", { className: "flex justify-between items-center mb-6" },
+                                        React.createElement("h4", { className: "font-bold text-xl" }, viewReport.title),
+                                        React.createElement("button", { onClick: () => setViewReport(null), className: "p-2 bg-slate-100 rounded-full" }, React.createElement(X, { size: 20 }))
+                                    ),
+                                    React.createElement("div", { className: "bg-slate-50 p-6 rounded-2xl border border-slate-200 font-mono text-sm mb-auto" }, viewReport.content)
+                                )
+                            ),
+
+                            // History Panel
+                            React.createElement("div", { className: "bg-white rounded-3xl shadow-sm border border-slate-200 p-6" },
+                                React.createElement("h3", { className: "font-bold text-lg text-slate-800 mb-6 flex items-center gap-2" }, React.createElement(Calendar, { className: "text-indigo-600" }), t('dash', 'history')),
+                                React.createElement("div", { className: "overflow-x-auto" },
+                                    React.createElement("table", { className: "w-full text-sm text-left" },
+                                        React.createElement("thead", { className: "text-xs text-slate-400 uppercase bg-slate-50" },
+                                            React.createElement("tr", null,
+                                                React.createElement("th", { className: "px-4 py-3 rounded-l-xl" }, t('dash', 'tableDate')),
+                                                React.createElement("th", { className: "px-4 py-3" }, t('dash', 'tableDoc')),
+                                                React.createElement("th", { className: "px-4 py-3" }, t('dash', 'tableType')),
+                                                React.createElement("th", { className: "px-4 py-3 rounded-r-xl" }, t('dash', 'tableStatus'))
+                                            )
+                                        ),
+                                        React.createElement("tbody", null,
+                                            history.map(apt => 
+                                                React.createElement("tr", { key: apt.id, className: "border-b border-slate-50" },
+                                                    React.createElement("td", { className: "px-4 py-4 font-medium" }, apt.date),
+                                                    React.createElement("td", { className: "px-4 py-4 text-slate-600" }, apt.doctor),
+                                                    React.createElement("td", { className: "px-4 py-4 text-slate-500" }, apt.type),
+                                                    React.createElement("td", { className: "px-4 py-4" }, 
+                                                        React.createElement("span", { className: "px-2 py-1 bg-emerald-100 text-emerald-700 rounded text-xs font-bold" }, apt.status)
+                                                    )
+                                                )
+                                            )
+                                        )
+                                    )
+                                )
+                            )
+                        ),
+                        React.createElement("div", { className: "space-y-8" },
+                             React.createElement("div", { className: "bg-gradient-to-br from-indigo-600 to-violet-700 rounded-3xl p-6 text-white shadow-xl" },
+                                React.createElement("div", { className: "flex items-center gap-2 mb-4" },
+                                    React.createElement("div", { className: "p-2 bg-white/20 rounded-lg" }, React.createElement(TrendingUp, { size: 20 })),
+                                    React.createElement("h3", { className: "font-bold" }, t('dash', 'ai'))
+                                ),
+                                React.createElement("div", { className: "bg-white/10 p-4 rounded-xl border border-white/10 mb-3" },
+                                    React.createElement("p", { className: "text-sm font-medium mb-1" }, t('dash', 'sugarAlert')),
+                                    React.createElement("p", { className: "text-xs text-indigo-100 opacity-80" }, "Sugar +5%. Walk 20 mins.")
+                                )
+                            ),
+                            React.createElement("div", { className: "bg-white rounded-3xl shadow-sm border border-slate-200 p-6" },
+                                React.createElement("h3", { className: "font-bold text-lg text-slate-800 mb-4 flex items-center gap-2" }, React.createElement(DollarSign, { className: "text-emerald-600" }), t('dash', 'compare')),
+                                React.createElement("div", { className: "space-y-3" },
+                                    labPrices.map((lab, idx) => 
+                                        React.createElement("div", { key: idx, className: "flex justify-between items-center p-3 rounded-2xl border border-slate-100 hover:border-emerald-500 hover:bg-emerald-50 transition-all cursor-pointer group" },
+                                            React.createElement("div", null,
+                                                React.createElement("p", { className: "font-bold text-slate-800 text-sm" }, lab.name),
+                                                React.createElement("p", { className: "text-[10px] text-slate-500" }, `${lab.distance} • ⭐ ${lab.rating}`)
+                                            ),
+                                            React.createElement("div", { className: "text-right" },
+                                                React.createElement("p", { className: "font-bold text-emerald-600" }, `₹${lab.price}`),
+                                                React.createElement("span", { className: "text-[10px] font-bold text-emerald-700 opacity-0 group-hover:opacity-100" }, "BOOK")
+                                            )
+                                        )
+                                    )
+                                )
+                            )
+                        )
+                    )
+                );
+            };
+
+            const AppointmentsView = ({ onDoctorSelect }) => {
+                const docs = getDoctors(language);
+                return React.createElement("div", { className: "grid md:grid-cols-2 gap-6" },
+                    docs.map(doc => 
+                        React.createElement("div", { key: doc.id, className: "bg-white p-6 rounded-3xl shadow-sm border border-slate-100 hover:shadow-xl transition-all group relative overflow-hidden" },
+                            doc.isPremium && React.createElement("div", { className: "absolute top-0 right-0 bg-amber-100 px-3 py-1 rounded-bl-xl" }, React.createElement(PremiumBadge, { text: t('doctor', 'premium') })),
+                            React.createElement("div", { className: "flex gap-4" },
+                                React.createElement("div", { className: `w-20 h-20 ${doc.imageColor} rounded-2xl flex items-center justify-center flex-shrink-0` }, React.createElement(User, { size: 32 })),
+                                React.createElement("div", null,
+                                    React.createElement("h3", { className: "font-bold text-lg text-slate-900" }, doc.name),
+                                    React.createElement("p", { className: "text-indigo-600 font-medium text-sm" }, doc.specialty),
+                                    React.createElement("div", { className: "flex items-center gap-2 mt-1" },
+                                        React.createElement(Star, { size: 14, className: "text-amber-500 fill-current" }),
+                                        React.createElement("span", { className: "text-xs font-bold text-slate-600" }, doc.rating)
+                                    ),
+                                    React.createElement("div", { className: "mt-3" }, React.createElement(VerifiedBadge, { text: t('doctor', 'verified') }))
+                                )
+                            ),
+                            React.createElement("div", { className: "mt-6 flex gap-3" },
+                                React.createElement("button", { onClick: () => onDoctorSelect(doc), className: "flex-1 bg-slate-900 text-white py-2.5 rounded-xl font-bold text-sm hover:bg-indigo-600 transition-colors" }, t('doctor', 'view')),
+                                React.createElement("div", { className: "px-4 py-2 bg-emerald-50 text-emerald-700 rounded-xl text-sm font-bold flex items-center gap-1" },
+                                    React.createElement(Clock, { size: 14 }), doc.waitTime
+                                )
+                            )
+                        )
+                    )
+                );
+            };
+
+            return React.createElement("div", { className: "min-h-screen bg-slate-50 pb-12" },
+                React.createElement("nav", { className: "sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-slate-200" },
+                    React.createElement("div", { className: "max-w-7xl mx-auto px-4 h-20 flex items-center justify-between" },
+                        React.createElement("div", { className: "flex items-center gap-3 cursor-pointer", onClick: () => setCurrentView('home') },
+                            React.createElement("div", { className: "w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-indigo-200" }, React.createElement(Activity)),
+                            React.createElement("span", { className: "font-bold text-2xl tracking-tight text-slate-900" }, "Arogya Path")
+                        ),
+                        React.createElement("div", { className: "hidden md:flex gap-1 bg-slate-100 p-1 rounded-full" },
+                            ['home', 'chat', 'appointments', 'dashboard'].map(view => 
+                                React.createElement("button", { 
+                                    key: view,
+                                    onClick: () => setCurrentView(view === 'appointments' ? 'appointments' : view),
+                                    className: `px-6 py-2.5 rounded-full text-sm font-bold transition-all ${currentView === view || (currentView === 'doctor-profile' && view === 'appointments') ? 'bg-white text-indigo-600 shadow-sm' : 'text-slate-500 hover:text-indigo-600'}`
+                                }, t('nav', view === 'appointments' ? 'find' : (view === 'dashboard' ? 'dash' : view)))
+                            )
+                        ),
+                        React.createElement("button", { onClick: () => setLanguage(null), className: "p-2 hover:bg-slate-100 rounded-full text-slate-500" }, React.createElement(Globe))
+                    )
+                ),
+                React.createElement("main", { className: "max-w-7xl mx-auto px-4 py-8" },
+                    currentView === 'home' && React.createElement(HomeView),
+                    currentView === 'chat' && React.createElement(VirtualDoctorView),
+                    currentView === 'doctor-profile' && selectedDoctor && React.createElement(DoctorProfileView, { doctor: selectedDoctor, onBack: () => setCurrentView('appointments') }),
+                    currentView === 'dashboard' && React.createElement(DashboardView),
+                    currentView === 'appointments' && React.createElement(AppointmentsView, { onDoctorSelect: handleDoctorClick })
+                ),
+                React.createElement("footer", { className: "text-center py-8 text-slate-400 text-sm border-t border-slate-200 mt-8" },
+                    React.createElement("div", { className: "flex flex-wrap justify-center gap-6" },
+                        React.createElement("span", { className: "flex items-center gap-2" }, React.createElement(Building2, { size: 14 }), t('business', 'sub')),
+                        React.createElement("span", { className: "flex items-center gap-2" }, React.createElement(Ticket, { size: 14 }), t('business', 'comm'))
+                    )
+                )
+            );
+        }
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(React.createElement(App));
+    </script>
+</body>
+</html>/
+  </script>
+
+</body>
+</html>
